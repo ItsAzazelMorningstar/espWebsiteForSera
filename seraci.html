@@ -313,11 +313,11 @@
                     Kontrol Komutları
                 </h3>
                 <div class="controls">
-                    <button class="btn" onclick="sendCommand('led_ac')">LED Aç</button>
-                    <button class="btn danger" onclick="sendCommand('led_kapat')">LED Kapat</button>
-                    <button class="btn success" onclick="sendCommand('alarm_ac')">Alarm Aç</button>
-                    <button class="btn danger" onclick="sendCommand('alarm_kapat')">Alarm Kapat</button>
-                    <button class="btn" onclick="sendCommand('veri_al')">Veri Al</button>
+                    <button class="btn" onclick="sendCommand('led ac')">LED Aç</button>
+                    <button class="btn danger" onclick="sendCommand('led kapat')">LED Kapat</button>
+                    <button class="btn success" onclick="sendCommand('alarm ac')">Alarm Aç</button>
+                    <button class="btn danger" onclick="sendCommand('alarm kapat')">Alarm Kapat</button>
+                    <button class="btn" onclick="sendCommand('veri al')">Veri Al</button>
                     <button class="btn" onclick="sendCommand('durum')">Durum</button>
                     <button class="btn" onclick="sendCommand('yardim')">Yardım</button>
                     <button class="btn danger" onclick="sendCommand('reset')">Reset</button>
@@ -407,6 +407,7 @@
         async function sendCommand(command) {
             try {
                 const button = event.target;
+                const originalText = button.textContent;
                 button.classList.add('loading');
                 button.textContent = 'Gönderiliyor...';
 
@@ -418,41 +419,44 @@
                     },
                     body: JSON.stringify({
                         chat_id: chatId,
-                        text: `/${command}`,
+                        text: command,
                     }),
                 });
 
                 const result = await response.json();
                 
                 if (result.ok) {
-                    showNotification(`Komut gönderildi: /${command}`);
-                    document.getElementById('lastCommand').textContent = `/${command}`;
+                    showNotification(`Komut gönderildi: ${command}`);
+                    document.getElementById('lastCommand').textContent = command;
                     
                     // Komut sonrası veri simülasyonu
                     simulateDataChange(command);
                 } else {
                     throw new Error(result.description || 'Bilinmeyen hata');
                 }
+                
+                // Buton durumunu geri yükle
+                button.classList.remove('loading');
+                button.textContent = originalText;
+                
             } catch (error) {
                 console.error('Komut gönderme hatası:', error);
                 showNotification(`Hata: ${error.message}`, true);
-            } finally {
-                // Buton durumunu geri yükle
-                setTimeout(() => {
-                    const button = event.target;
-                    button.classList.remove('loading');
-                    button.textContent = getButtonOriginalText(command);
-                }, 1000);
+                
+                // Hata durumunda da buton durumunu geri yükle
+                const button = event.target;
+                button.classList.remove('loading');
+                button.textContent = getButtonOriginalText(command);
             }
         }
 
         function getButtonOriginalText(command) {
             const buttonTexts = {
-                'led_ac': 'LED Aç',
-                'led_kapat': 'LED Kapat',
-                'alarm_ac': 'Alarm Aç',
-                'alarm_kapat': 'Alarm Kapat',
-                'veri_al': 'Veri Al',
+                'led ac': 'LED Aç',
+                'led kapat': 'LED Kapat',
+                'alarm ac': 'Alarm Aç',
+                'alarm kapat': 'Alarm Kapat',
+                'veri al': 'Veri Al',
                 'durum': 'Durum',
                 'yardim': 'Yardım',
                 'reset': 'Reset'
@@ -463,19 +467,19 @@
         function simulateDataChange(command) {
             // Komutlara göre sistem durumunu simüle et
             switch(command) {
-                case 'led_ac':
+                case 'led ac':
                     currentData.systemStatus.led = 'YANDI';
                     break;
-                case 'led_kapat':
+                case 'led kapat':
                     currentData.systemStatus.led = 'KAPALI';
                     break;
-                case 'alarm_ac':
+                case 'alarm ac':
                     currentData.systemStatus.alarm = 'AKTIF';
                     break;
-                case 'alarm_kapat':
+                case 'alarm kapat':
                     currentData.systemStatus.alarm = 'KAPALI';
                     break;
-                case 'veri_al':
+                case 'veri al':
                     // Rastgele veri güncelle
                     currentData.temperature = (Math.random() * 10 + 15).toFixed(1);
                     currentData.light = Math.floor(Math.random() * 100);
