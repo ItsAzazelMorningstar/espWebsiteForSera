@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IoT Kontrol Paneli</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .card h3 {
+            color: #4a5568;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .icon {
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+        }
+
+        .data-display {
+            background: #f7fafc;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 4px solid #667eea;
+        }
+
+        .data-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 8px 0;
+            padding: 5px 0;
+        }
+
+        .data-label {
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .data-value {
+            font-weight: 700;
+            color: #2d3748;
+            background: #e2e8f0;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn.danger {
+            background: linear-gradient(135deg, #f56565, #e53e3e);
+            box-shadow: 0 4px 15px rgba(245, 101, 101, 0.3);
+        }
+
+        .btn.success {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+
+        .status-online {
+            background: #48bb78;
+        }
+
+        .status-offline {
+            background: #f56565;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .refresh-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 24px;
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .refresh-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #48bb78;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.error {
+            background: #f56565;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .controls {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏠 IoT Kontrol Paneli</h1>
+            <p>Telegram Bot ile Entegre Sistem Yönetimi</p>
+        </div>
+
+        <div class="dashboard">
+            <!-- Son Veriler Kartı -->
+            <div class="card">
+                <h3>
+                    <span class="icon">📊</span>
+                    Son Veriler
+                </h3>
+                <div class="data-display" id="latestData">
+                    <div class="data-item">
+                        <span class="data-label">Sıcaklık:</span>
+                        <span class="data-value" id="temperature">-- °C</span>
+                    </div>
+                    <div class="data-item">
+                        <span class="data-label">Işık:</span>
+                        <span class="data-value" id="light">--</span>
+                    </div>
+                    <div class="data-item">
+                        <span class="data-label">Son Güncelleme:</span>
+                        <span class="data-value" id="lastUpdate">--</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sistem Durumu -->
+            <div class="card">
+                <h3>
+                    <span class="icon">⚡</span>
+                    Sistem Durumu
+                </h3>
+                <div class="data-display" id="systemStatus">
+                    <div class="data-item">
+                        <span class="data-label">Sıcaklık:</span>
+                        <span class="data-value" id="sys-temperature">-- °C</span>
+                    </div>
+                    <div class="data-item">
+                        <span class="data-label">Işık:</span>
+                        <span class="data-value" id="sys-light">--</span>
+                    </div>
+                    <div class="data-item">
+                        <span class="data-label">LED:</span>
+                        <span class="data-value" id="sys-led">--</span>
+                    </div>
+                    <div class="data-item">
+                        <span class="data-label">Alarm:</span>
+                        <span class="data-value" id="sys-alarm">--</span>
+                    </div>
+                    <div class="data-item">
+                        <span class="data-label">WiFi:</span>
+                        <span class="data-value" id="sys-wifi">-- dBm</span>
+                    </div>
+                    <div class="data-item">
+                        <span class="data-label">Veri Gönderme:</span>
+                        <span class="data-value" id="sys-interval">-- dakika</span>
+                    </div>
+                    <div class="data-item">
+                        <span class="data-label">Kayıtlı Veri:</span>
+                        <span class="data-value" id="sys-records">--/144</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Kontrol Komutları -->
+            <div class="card">
+                <h3>
+                    <span class="icon">🎮</span>
+                    Kontrol Komutları
+                </h3>
+                <div class="controls">
+                    <button class="btn" onclick="sendCommand('led_ac')">LED Aç</button>
+                    <button class="btn danger" onclick="sendCommand('led_kapat')">LED Kapat</button>
+                    <button class="btn success" onclick="sendCommand('alarm_ac')">Alarm Aç</button>
+                    <button class="btn danger" onclick="sendCommand('alarm_kapat')">Alarm Kapat</button>
+                    <button class="btn" onclick="sendCommand('veri_al')">Veri Al</button>
+                    <button class="btn" onclick="sendCommand('durum')">Durum</button>
+                    <button class="btn" onclick="sendCommand('yardim')">Yardım</button>
+                    <button class="btn danger" onclick="sendCommand('reset')">Reset</button>
+                </div>
+            </div>
+
+            <!-- Bağlantı Durumu -->
+            <div class="card">
+                <h3>
+                    <span class="icon">🔗</span>
+                    Bağlantı Durumu
+                </h3>
+                <div class="data-display">
+                    <div class="data-item">
+                        <span class="data-label">Telegram Bot:</span>
+                        <span class="data-value">
+                            <span class="status-indicator status-online"></span>
+                            Aktif
+                        </span>
+                    </div>
+                    <div class="data-item">
+                        <span class="data-label">Chat ID:</span>
+                        <span class="data-value" id="chatIdDisplay">-1002701380241</span>
+                    </div>
+                    <div class="data-item">
+                        <span class="data-label">Son Komut:</span>
+                        <span class="data-value" id="lastCommand">--</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button class="refresh-btn" onclick="refreshData()" title="Verileri Yenile">
+        🔄
+    </button>
+
+    <div class="notification" id="notification"></div>
+
+    <script>
+        const telegramBotToken = "8096908153:AAGbMCuWOfHEf1GWEPGvCOpSt65ZXR0AHlE";
+        const chatId = "-1002701380241";
+        
+        // Simüle edilmiş veri
+        let currentData = {
+            temperature: 17.6,
+            light: 0,
+            lastUpdate: new Date(),
+            systemStatus: {
+                temperature: 18.0,
+                light: 0,
+                led: "KAPALI",
+                alarm: "AKTIF",
+                wifi: -82,
+                interval: 5,
+                records: 0
+            }
+        };
+
+        function showNotification(message, isError = false) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${isError ? 'error' : ''} show`;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        function updateDisplay() {
+            // Son veriler
+            document.getElementById('temperature').textContent = `${currentData.temperature} °C`;
+            document.getElementById('light').textContent = currentData.light;
+            document.getElementById('lastUpdate').textContent = currentData.lastUpdate.toLocaleTimeString();
+
+            // Sistem durumu
+            const sys = currentData.systemStatus;
+            document.getElementById('sys-temperature').textContent = `${sys.temperature} °C`;
+            document.getElementById('sys-light').textContent = sys.light;
+            document.getElementById('sys-led').textContent = sys.led;
+            document.getElementById('sys-alarm').textContent = sys.alarm;
+            document.getElementById('sys-wifi').textContent = `${sys.wifi} dBm`;
+            document.getElementById('sys-interval').textContent = `${sys.interval} dakika`;
+            document.getElementById('sys-records').textContent = `${sys.records}/144`;
+        }
+
+        async function sendCommand(command) {
+            try {
+                const button = event.target;
+                button.classList.add('loading');
+                button.textContent = 'Gönderiliyor...';
+
+                const url = `https://api.telegram.org/bot${telegramBotToken}/sendMessage`;
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        chat_id: chatId,
+                        text: `/${command}`,
+                    }),
+                });
+
+                const result = await response.json();
+                
+                if (result.ok) {
+                    showNotification(`Komut gönderildi: /${command}`);
+                    document.getElementById('lastCommand').textContent = `/${command}`;
+                    
+                    // Komut sonrası veri simülasyonu
+                    simulateDataChange(command);
+                } else {
+                    throw new Error(result.description || 'Bilinmeyen hata');
+                }
+            } catch (error) {
+                console.error('Komut gönderme hatası:', error);
+                showNotification(`Hata: ${error.message}`, true);
+            } finally {
+                // Buton durumunu geri yükle
+                setTimeout(() => {
+                    const button = event.target;
+                    button.classList.remove('loading');
+                    button.textContent = getButtonOriginalText(command);
+                }, 1000);
+            }
+        }
+
+        function getButtonOriginalText(command) {
+            const buttonTexts = {
+                'led_ac': 'LED Aç',
+                'led_kapat': 'LED Kapat',
+                'alarm_ac': 'Alarm Aç',
+                'alarm_kapat': 'Alarm Kapat',
+                'veri_al': 'Veri Al',
+                'durum': 'Durum',
+                'yardim': 'Yardım',
+                'reset': 'Reset'
+            };
+            return buttonTexts[command] || command;
+        }
+
+        function simulateDataChange(command) {
+            // Komutlara göre sistem durumunu simüle et
+            switch(command) {
+                case 'led_ac':
+                    currentData.systemStatus.led = 'YANDI';
+                    break;
+                case 'led_kapat':
+                    currentData.systemStatus.led = 'KAPALI';
+                    break;
+                case 'alarm_ac':
+                    currentData.systemStatus.alarm = 'AKTIF';
+                    break;
+                case 'alarm_kapat':
+                    currentData.systemStatus.alarm = 'KAPALI';
+                    break;
+                case 'veri_al':
+                    // Rastgele veri güncelle
+                    currentData.temperature = (Math.random() * 10 + 15).toFixed(1);
+                    currentData.light = Math.floor(Math.random() * 100);
+                    currentData.lastUpdate = new Date();
+                    break;
+                case 'durum':
+                    // Sistem durumunu güncelle
+                    currentData.systemStatus.temperature = (Math.random() * 5 + 16).toFixed(1);
+                    currentData.systemStatus.records = Math.floor(Math.random() * 144);
+                    break;
+            }
+            updateDisplay();
+        }
+
+        function refreshData() {
+            const refreshBtn = document.querySelector('.refresh-btn');
+            refreshBtn.style.transform = 'rotate(360deg) scale(1.1)';
+            
+            // Rastgele veri güncellemesi simülasyonu
+            currentData.temperature = (Math.random() * 10 + 15).toFixed(1);
+            currentData.light = Math.floor(Math.random() * 100);
+            currentData.lastUpdate = new Date();
+            currentData.systemStatus.temperature = (Math.random() * 5 + 16).toFixed(1);
+            currentData.systemStatus.wifi = -75 - Math.floor(Math.random() * 20);
+            
+            updateDisplay();
+            showNotification('Veriler güncellendi');
+            
+            setTimeout(() => {
+                refreshBtn.style.transform = '';
+            }, 300);
+        }
+
+        // Sayfa yüklendiğinde verileri göster
+        window.addEventListener('load', () => {
+            updateDisplay();
+            showNotification('Kontrol paneli hazır');
+        });
+
+        // Otomatik veri güncelleme (30 saniye)
+        setInterval(() => {
+            // Küçük veri değişiklikleri simüle et
+            currentData.temperature = (parseFloat(currentData.temperature) + (Math.random() - 0.5) * 0.2).toFixed(1);
+            currentData.lastUpdate = new Date();
+            updateDisplay();
+        }, 30000);
+    </script>
+</body>
+</html>
