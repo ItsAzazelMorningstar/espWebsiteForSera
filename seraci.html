@@ -196,9 +196,16 @@
             transform: scale(1.1);
         }
 
-        .loading {
-            opacity: 0.6;
-            pointer-events: none;
+        .btn.loading {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none !important;
         }
 
         .notification {
@@ -405,12 +412,15 @@
         }
 
         async function sendCommand(command) {
-            try {
-                const button = event.target;
-                const originalText = button.textContent;
-                button.classList.add('loading');
-                button.textContent = 'Gönderiliyor...';
+            const button = event.target;
+            const originalText = button.textContent;
+            
+            // Buton durumunu değiştir
+            button.disabled = true;
+            button.classList.add('loading');
+            button.textContent = 'Gönderiliyor...';
 
+            try {
                 const url = `https://api.telegram.org/bot${telegramBotToken}/sendMessage`;
                 const response = await fetch(url, {
                     method: 'POST',
@@ -426,7 +436,7 @@
                 const result = await response.json();
                 
                 if (result.ok) {
-                    showNotification(`Komut gönderildi: ${command}`);
+                    showNotification(`Mesaj gönderildi: ${command}`);
                     document.getElementById('lastCommand').textContent = command;
                     
                     // Komut sonrası veri simülasyonu
@@ -435,18 +445,16 @@
                     throw new Error(result.description || 'Bilinmeyen hata');
                 }
                 
-                // Buton durumunu geri yükle
-                button.classList.remove('loading');
-                button.textContent = originalText;
-                
             } catch (error) {
-                console.error('Komut gönderme hatası:', error);
+                console.error('Mesaj gönderme hatası:', error);
                 showNotification(`Hata: ${error.message}`, true);
-                
-                // Hata durumunda da buton durumunu geri yükle
-                const button = event.target;
-                button.classList.remove('loading');
-                button.textContent = getButtonOriginalText(command);
+            } finally {
+                // Her durumda buton durumunu geri yükle
+                setTimeout(() => {
+                    button.disabled = false;
+                    button.classList.remove('loading');
+                    button.textContent = originalText;
+                }, 500);
             }
         }
 
