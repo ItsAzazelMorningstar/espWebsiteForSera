@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IoT Kontrol Paneli</title>
+    <title>Sera Kontrol Merkezi</title>
     <style>
         * {
             margin: 0;
@@ -13,161 +13,68 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
             min-height: 100vh;
             color: #333;
         }
 
-        .container {
-            max-width: 1200px;
+        .dashboard {
+            max-width: 1400px;
             margin: 0 auto;
             padding: 20px;
         }
 
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-            color: white;
-        }
-
-        .header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-
-        .header p {
-            font-size: 1.1rem;
-            opacity: 0.9;
-        }
-
-        .dashboard {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .card {
+        .dashboard-header {
             background: rgba(255, 255, 255, 0.95);
             border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            padding: 20px 30px;
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
         }
 
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
-        }
-
-        .card h3 {
-            color: #4a5568;
-            margin-bottom: 15px;
-            font-size: 1.3rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .icon {
-            width: 24px;
-            height: 24px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            border-radius: 50%;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 12px;
-        }
-
-        .data-display {
-            background: #f7fafc;
-            border-radius: 10px;
-            padding: 15px;
-            margin: 10px 0;
-            border-left: 4px solid #667eea;
-        }
-
-        .data-item {
+        .header-content {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin: 8px 0;
-            padding: 5px 0;
         }
 
-        .data-label {
-            font-weight: 600;
-            color: #4a5568;
-        }
-
-        .data-value {
-            font-weight: 700;
+        .header-left h1 {
             color: #2d3748;
-            background: #e2e8f0;
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-        }
-
-        .controls {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            font-size: 2.2rem;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
             gap: 15px;
-            margin-top: 20px;
         }
 
-        .btn {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 0.95rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        .title-icon {
+            font-size: 2.5rem;
         }
 
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        .system-time {
+            color: #718096;
+            font-size: 1rem;
+            font-weight: 500;
         }
 
-        .btn:active {
-            transform: translateY(0);
-        }
-
-        .btn.danger {
-            background: linear-gradient(135deg, #f56565, #e53e3e);
-            box-shadow: 0 4px 15px rgba(245, 101, 101, 0.3);
-        }
-
-        .btn.success {
-            background: linear-gradient(135deg, #48bb78, #38a169);
-            box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
-        }
-
-        .status-indicator {
-            display: inline-block;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            margin-right: 8px;
-            animation: pulse 2s infinite;
-        }
-
-        .status-online {
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
             background: #48bb78;
+            color: white;
+            border-radius: 20px;
+            font-weight: 600;
         }
 
-        .status-offline {
-            background: #f56565;
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
         }
 
         @keyframes pulse {
@@ -176,36 +83,530 @@
             100% { opacity: 1; }
         }
 
-        .refresh-btn {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            border: none;
-            cursor: pointer;
-            font-size: 24px;
-            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 350px 300px;
+            grid-template-rows: auto auto auto;
+            gap: 25px;
+        }
+
+        .sensors-panel {
+            grid-column: 1;
+            grid-row: 1;
+        }
+
+        .light-control-panel {
+            grid-column: 2;
+            grid-row: 1;
+        }
+
+        .alerts-panel {
+            grid-column: 3;
+            grid-row: 1 / 3;
+        }
+
+        .systems-panel {
+            grid-column: 1;
+            grid-row: 2;
+        }
+
+        .notification-panel {
+            grid-column: 2;
+            grid-row: 2;
+        }
+
+        .telegram-panel {
+            grid-column: 1 / 3;
+            grid-row: 3;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .panel-title {
+            font-size: 1.3rem;
+            color: #2d3748;
+            font-weight: 700;
+        }
+
+        .panel-icon {
+            font-size: 1.5rem;
+        }
+
+        .sensors-panel,
+        .light-control-panel,
+        .alerts-panel,
+        .systems-panel,
+        .notification-panel,
+        .telegram-panel {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .sensors-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .systems-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .sensor-card,
+        .system-card {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
             transition: all 0.3s ease;
         }
 
-        .refresh-btn:hover {
-            transform: scale(1.1);
+        .sensor-card:hover,
+        .system-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
         }
 
-        .btn.loading {
+        .sensor-header,
+        .system-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .sensor-icon,
+        .system-icon {
+            font-size: 2rem;
+        }
+
+        .sensor-name,
+        .system-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 2px;
+        }
+
+        .sensor-unit {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        .sensor-display {
+            margin: 15px 0;
+        }
+
+        .sensor-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+
+        .sensor-target {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        .sensor-progress-container {
+            margin-top: 15px;
+        }
+
+        .sensor-progress-track {
+            background: #e2e8f0;
+            height: 6px;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .sensor-progress {
+            background: linear-gradient(90deg, #48bb78, #38a169);
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        .sensor-range {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: #a0aec0;
+        }
+
+        .system-status {
+            font-size: 0.9rem;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 12px;
+        }
+
+        .system-status.active {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .system-status.inactive {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .system-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .system-toggle {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .system-toggle:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .auto-switch {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+
+        .auto-switch input {
+            width: 40px;
+            height: 20px;
+            appearance: none;
+            background: #cbd5e0;
+            border-radius: 10px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .auto-switch input:checked {
+            background: #48bb78;
+        }
+
+        .auto-switch input::before {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s ease;
+        }
+
+        .auto-switch input:checked::before {
+            transform: translateX(20px);
+        }
+
+        .light-controls {
+            text-align: center;
+        }
+
+        .light-status-display {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 10px;
+        }
+
+        .light-icon {
+            font-size: 2.5rem;
+        }
+
+        .light-actual-status {
+            font-size: 1.2rem;
+            font-weight: 700;
+            padding: 5px 12px;
+            border-radius: 15px;
+        }
+
+        .light-actual-status.on {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .light-actual-status.off {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .light-control-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .light-control-btn {
+            background: #e2e8f0;
+            color: #4a5568;
+            border: none;
+            padding: 12px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .light-control-btn.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .light-control-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .light-schedule {
+            background: #f8fafc;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .schedule-title {
+            font-size: 0.9rem;
+            color: #718096;
+            margin-bottom: 5px;
+        }
+
+        .schedule-time {
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .alarm-controls {
+            margin-bottom: 20px;
+        }
+
+        .alarm-toggle {
+            width: 100%;
+            background: #48bb78;
+            color: white;
+            border: none;
+            padding: 12px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .alarm-toggle:not(.active) {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .alarm-count {
+            background: #f56565;
+            color: white;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .alarm-count:not(.has-alarms) {
+            background: #e2e8f0;
+            color: #a0aec0;
+        }
+
+        .alarms-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .no-alarms {
+            text-align: center;
+            color: #a0aec0;
+            padding: 20px;
+            font-style: italic;
+        }
+
+        .alarm-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            margin-bottom: 8px;
+            background: #fed7d7;
+            border-radius: 8px;
+            border-left: 4px solid #f56565;
+        }
+
+        .alarm-icon {
+            font-size: 1.2rem;
+        }
+
+        .alarm-message {
+            font-weight: 600;
+            color: #742a2a;
+            font-size: 0.9rem;
+        }
+
+        .alarm-value {
+            font-size: 0.8rem;
+            color: #a0224a;
+        }
+
+        .notification-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .notification-setting {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .notification-setting label {
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .notification-interval-select {
+            padding: 8px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+        }
+
+        .notification-status {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            padding: 10px;
+            background: #f8fafc;
+            border-radius: 8px;
+        }
+
+        .notification-interval,
+        .last-notification {
+            font-size: 0.9rem;
+            color: #718096;
+        }
+
+        /* Telegram Panel Stilleri */
+        .telegram-controls {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 25px;
+        }
+
+        .telegram-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .telegram-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .telegram-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .telegram-btn.danger {
+            background: linear-gradient(135deg, #f56565, #e53e3e);
+            box-shadow: 0 4px 15px rgba(245, 101, 101, 0.3);
+        }
+
+        .telegram-btn.success {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
+        }
+
+        .telegram-btn:disabled {
             opacity: 0.7;
             cursor: not-allowed;
             transform: none !important;
         }
 
-        .btn:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-            transform: none !important;
+        .telegram-status {
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 5px 0;
+        }
+
+        .status-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .status-label {
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .status-value {
+            font-weight: 700;
+            color: #2d3748;
+            background: #e2e8f0;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.9rem;
         }
 
         .notification {
@@ -230,194 +631,632 @@
             background: #f56565;
         }
 
+        @keyframes ripple {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto;
+            }
+            
+            .sensors-panel,
+            .light-control-panel,
+            .alerts-panel,
+            .systems-panel,
+            .notification-panel,
+            .telegram-panel {
+                grid-column: 1;
+                grid-row: auto;
+            }
+        }
+
         @media (max-width: 768px) {
-            .container {
+            .dashboard {
                 padding: 10px;
             }
             
-            .header h1 {
-                font-size: 2rem;
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
             }
             
-            .controls {
+            .sensors-grid,
+            .systems-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .telegram-controls {
+                grid-template-columns: 1fr;
+            }
+            
+            .telegram-buttons {
                 grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🏠 IoT Kontrol Paneli</h1>
-            <p>Telegram Bot ile Entegre Sistem Yönetimi</p>
-        </div>
-
-        <div class="dashboard">
-            <!-- Son Veriler Kartı -->
-            <div class="card">
-                <h3>
-                    <span class="icon">📊</span>
-                    Son Veriler
-                </h3>
-                <div class="data-display" id="latestData">
-                    <div class="data-item">
-                        <span class="data-label">Sıcaklık:</span>
-                        <span class="data-value" id="temperature">-- °C</span>
-                    </div>
-                    <div class="data-item">
-                        <span class="data-label">Işık:</span>
-                        <span class="data-value" id="light">--</span>
-                    </div>
-                    <div class="data-item">
-                        <span class="data-label">Son Güncelleme:</span>
-                        <span class="data-value" id="lastUpdate">--</span>
+    <div class="dashboard">
+        <header class="dashboard-header">
+            <div class="header-content">
+                <div class="header-left">
+                    <h1 class="dashboard-title">
+                        <span class="title-icon">🌱</span>
+                        Sera Kontrol Merkezi
+                    </h1>
+                    <div class="system-time" id="system-time"></div>
+                </div>
+                <div class="header-right">
+                    <div class="connection-status online">
+                        <div class="status-dot"></div>
+                        <span>Telegram Bot Aktif</span>
                     </div>
                 </div>
             </div>
+        </header>
 
-            <!-- Sistem Durumu -->
-            <div class="card">
-                <h3>
-                    <span class="icon">⚡</span>
-                    Sistem Durumu
-                </h3>
-                <div class="data-display" id="systemStatus">
-                    <div class="data-item">
-                        <span class="data-label">Sıcaklık:</span>
-                        <span class="data-value" id="sys-temperature">-- °C</span>
+        <main class="dashboard-main">
+            <div class="dashboard-grid">
+                <!-- Sol Panel - Sensörler -->
+                <section class="sensors-panel">
+                    <div class="panel-header">
+                        <h2 class="panel-title">Çevresel Sensörler</h2>
+                        <div class="panel-icon">📊</div>
                     </div>
-                    <div class="data-item">
-                        <span class="data-label">Işık:</span>
-                        <span class="data-value" id="sys-light">--</span>
+                    <div class="sensors-grid" id="sensors-grid">
+                        <!-- Sensör kartları buraya eklenecek -->
                     </div>
-                    <div class="data-item">
-                        <span class="data-label">LED:</span>
-                        <span class="data-value" id="sys-led">--</span>
-                    </div>
-                    <div class="data-item">
-                        <span class="data-label">Alarm:</span>
-                        <span class="data-value" id="sys-alarm">--</span>
-                    </div>
-                    <div class="data-item">
-                        <span class="data-label">WiFi:</span>
-                        <span class="data-value" id="sys-wifi">-- dBm</span>
-                    </div>
-                    <div class="data-item">
-                        <span class="data-label">Veri Gönderme:</span>
-                        <span class="data-value" id="sys-interval">-- dakika</span>
-                    </div>
-                    <div class="data-item">
-                        <span class="data-label">Kayıtlı Veri:</span>
-                        <span class="data-value" id="sys-records">--/144</span>
-                    </div>
-                </div>
-            </div>
+                </section>
 
-            <!-- Kontrol Komutları -->
-            <div class="card">
-                <h3>
-                    <span class="icon">🎮</span>
-                    Kontrol Komutları
-                </h3>
-                <div class="controls">
-                    <button class="btn" onclick="sendCommand('led ac')">LED Aç</button>
-                    <button class="btn danger" onclick="sendCommand('led kapat')">LED Kapat</button>
-                    <button class="btn success" onclick="sendCommand('alarm ac')">Alarm Aç</button>
-                    <button class="btn danger" onclick="sendCommand('alarm kapat')">Alarm Kapat</button>
-                    <button class="btn" onclick="sendCommand('veri al')">Veri Al</button>
-                    <button class="btn" onclick="sendCommand('durum')">Durum</button>
-                    <button class="btn" onclick="sendCommand('yardim')">Yardım</button>
-                    <button class="btn danger" onclick="sendCommand('reset')">Reset</button>
-                </div>
-            </div>
+                <!-- Orta Panel - Işık Kontrol -->
+                <section class="light-control-panel">
+                    <div class="panel-header">
+                        <h2 class="panel-title">Işık Sistemi</h2>
+                        <div class="panel-icon">💡</div>
+                    </div>
+                    <div class="light-controls">
+                        <div class="light-status-display">
+                            <div class="light-icon">💡</div>
+                            <div class="light-status-text">
+                                <div class="light-actual-status off">KAPALI</div>
+                                <div class="light-mode-text">Otomatik Mod</div>
+                            </div>
+                        </div>
+                        <div class="light-control-buttons">
+                            <button class="light-control-btn active" data-mode="auto">
+                                <span class="btn-icon">🔄</span>
+                                <span>Otomatik</span>
+                            </button>
+                            <button class="light-control-btn" data-mode="on">
+                                <span class="btn-icon">🔆</span>
+                                <span>Açık</span>
+                            </button>
+                            <button class="light-control-btn" data-mode="off">
+                                <span class="btn-icon">🌙</span>
+                                <span>Kapalı</span>
+                            </button>
+                        </div>
+                        <div class="light-schedule">
+                            <div class="schedule-title">Otomatik Program</div>
+                            <div class="schedule-time">06:00 - 20:00</div>
+                        </div>
+                    </div>
+                </section>
 
-            <!-- Bağlantı Durumu -->
-            <div class="card">
-                <h3>
-                    <span class="icon">🔗</span>
-                    Bağlantı Durumu
-                </h3>
-                <div class="data-display">
-                    <div class="data-item">
-                        <span class="data-label">Telegram Bot:</span>
-                        <span class="data-value">
-                            <span class="status-indicator status-online"></span>
-                            Aktif
-                        </span>
+                <!-- Sağ Panel - Alarm ve Bildirimler -->
+                <section class="alerts-panel">
+                    <div class="panel-header">
+                        <h2 class="panel-title">Alarm Sistemi</h2>
+                        <div class="alarm-count">0</div>
                     </div>
-                    <div class="data-item">
-                        <span class="data-label">Chat ID:</span>
-                        <span class="data-value" id="chatIdDisplay">-1002701380241</span>
+                    <div class="alarm-controls">
+                        <button class="alarm-toggle active">
+                            <span class="toggle-icon">🚨</span>
+                            <span>Alarm Sistemi</span>
+                        </button>
                     </div>
-                    <div class="data-item">
-                        <span class="data-label">Son Komut:</span>
-                        <span class="data-value" id="lastCommand">--</span>
+                    <div class="alarms-list">
+                        <div class="no-alarms">Aktif alarm yok</div>
                     </div>
-                </div>
+                </section>
+
+                <!-- Alt Panel - Sistem Kontrolleri -->
+                <section class="systems-panel">
+                    <div class="panel-header">
+                        <h2 class="panel-title">Sistem Kontrolleri</h2>
+                        <div class="panel-icon">⚙️</div>
+                    </div>
+                    <div class="systems-grid" id="systems-grid">
+                        <!-- Sistem kartları buraya eklenecek -->
+                    </div>
+                </section>
+
+                <!-- Bildirim Ayarları -->
+                <section class="notification-panel">
+                    <div class="panel-header">
+                        <h2 class="panel-title">Bildirim Ayarları</h2>
+                        <div class="panel-icon">📱</div>
+                    </div>
+                    <div class="notification-controls">
+                        <div class="notification-setting">
+                            <label>Bildirim Süresi:</label>
+                            <select class="notification-interval-select">
+                                <option value="15">15 dakika</option>
+                                <option value="30" selected>30 dakika</option>
+                                <option value="60">1 saat</option>
+                                <option value="120">2 saat</option>
+                            </select>
+                        </div>
+                        <div class="notification-status">
+                            <div class="notification-interval">30 dakika</div>
+                            <div class="last-notification">Son: --:--</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Telegram Bot Kontrol Paneli -->
+                <section class="telegram-panel">
+                    <div class="panel-header">
+                        <h2 class="panel-title">Telegram Bot Kontrolleri</h2>
+                        <div class="panel-icon">🤖</div>
+                    </div>
+                    <div class="telegram-controls">
+                        <div class="telegram-buttons">
+                            <button class="telegram-btn success" onclick="sendTelegramCommand('led ac')">LED Aç</button>
+                            <button class="telegram-btn danger" onclick="sendTelegramCommand('led kapat')">LED Kapat</button>
+                            <button class="telegram-btn success" onclick="sendTelegramCommand('alarm ac')">Alarm Aç</button>
+                            <button class="telegram-btn danger" onclick="sendTelegramCommand('alarm kapat')">Alarm Kapat</button>
+                            <button class="telegram-btn" onclick="sendTelegramCommand('veri al')">Veri Al</button>
+                            <button class="telegram-btn" onclick="sendTelegramCommand('durum')">Durum</button>
+                            <button class="telegram-btn" onclick="sendTelegramCommand('yardim')">Yardım</button>
+                            <button class="telegram-btn danger" onclick="sendTelegramCommand('reset')">Reset</button>
+                        </div>
+                        <div class="telegram-status">
+                            <div class="status-item">
+                                <span class="status-label">Chat ID:</span>
+                                <span class="status-value" id="chatIdDisplay">-1002701380241</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="status-label">Son Komut:</span>
+                                <span class="status-value" id="lastCommand">--</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="status-label">WiFi Sinyal:</span>
+                                <span class="status-value" id="wifiSignal">-82 dBm</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="status-label">Kayıtlı Veri:</span>
+                                <span class="status-value" id="dataRecords">0/144</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
             </div>
-        </div>
+        </main>
     </div>
-
-    <button class="refresh-btn" onclick="refreshData()" title="Verileri Yenile">
-        🔄
-    </button>
 
     <div class="notification" id="notification"></div>
 
     <script>
+        // Telegram Bot yapılandırması
         const telegramBotToken = "8096908153:AAGbMCuWOfHEf1GWEPGvCOpSt65ZXR0AHlE";
         const chatId = "-1002701380241";
-        
-        // Simüle edilmiş veri
-        let currentData = {
-            temperature: 17.6,
-            light: 0,
-            lastUpdate: new Date(),
-            systemStatus: {
-                temperature: 18.0,
-                light: 0,
-                led: "KAPALI",
-                alarm: "AKTIF",
-                wifi: -82,
-                interval: 5,
-                records: 0
+
+        // Sera Kontrol Sistemi Sınıfı
+        class GreenhouseController {
+            constructor() {
+                this.sensors = {
+                    temperature: { current: 22, target: 24, min: 18, max: 28 },
+                    humidity: { current: 65, target: 70, min: 60, max: 80 },
+                    soilMoisture: { current: 45, target: 60, min: 40, max: 70 },
+                    lightLevel: { current: 750, target: 800, min: 500, max: 1000 }
+                };
+
+                this.lightSystem = {
+                    status: 'auto',
+                    autoSchedule: { start: '06:00', end: '20:00' },
+                    manualOverride: false
+                };
+
+                this.alarmSystem = {
+                    enabled: true,
+                    activeAlarms: [],
+                    soundEnabled: true,
+                    emailEnabled: false
+                };
+
+                this.notificationSettings = {
+                    interval: 30,
+                    lastNotification: null,
+                    enabled: true
+                };
+
+                this.systems = {
+                    heating: { status: false, auto: true },
+                    cooling: { status: false, auto: true },
+                    watering: { status: false, auto: true, lastRun: '2 saat önce' },
+                    ventilation: { status: false, auto: true }
+                };
+
+                this.isRunning = false;
+                this.notificationTimer = null;
             }
-        };
 
-        function showNotification(message, isError = false) {
-            const notification = document.getElementById('notification');
-            notification.textContent = message;
-            notification.className = `notification ${isError ? 'error' : ''} show`;
-            
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 3000);
+            start() {
+                this.isRunning = true;
+                this.simulateData();
+                setInterval(() => this.updateSensors(), 2000);
+                setInterval(() => this.checkAlarms(), 3000);
+                this.startNotificationTimer();
+            }
+
+            simulateData() {
+                Object.keys(this.sensors).forEach(sensor => {
+                    const data = this.sensors[sensor];
+                    const variation = (Math.random() - 0.5) * 2;
+                    data.current = Math.max(data.min, Math.min(data.max, data.current + variation));
+                });
+            }
+
+            updateSensors() {
+                if (!this.isRunning) return;
+                
+                this.simulateData();
+                this.autoControlSystems();
+                this.controlLightSystem();
+                this.updateUI();
+            }
+
+            controlLightSystem() {
+                const currentTime = new Date();
+                const currentHour = currentTime.getHours();
+                const currentMinute = currentTime.getMinutes();
+                const currentTimeStr = `${currentHour.toString().padStart(2, '0')}:${currentMinute.toString().padStart(2, '0')}`;
+                
+                if (this.lightSystem.status === 'auto' && !this.lightSystem.manualOverride) {
+                    const startTime = this.lightSystem.autoSchedule.start;
+                    const endTime = this.lightSystem.autoSchedule.end;
+                    
+                    const isInSchedule = this.isTimeInRange(currentTimeStr, startTime, endTime);
+                    this.lightSystem.actualStatus = isInSchedule;
+                } else if (this.lightSystem.status === 'on') {
+                    this.lightSystem.actualStatus = true;
+                } else {
+                    this.lightSystem.actualStatus = false;
+                }
+            }
+
+            isTimeInRange(current, start, end) {
+                const currentMinutes = this.timeToMinutes(current);
+                const startMinutes = this.timeToMinutes(start);
+                const endMinutes = this.timeToMinutes(end);
+                
+                return currentMinutes >= startMinutes && currentMinutes <= endMinutes;
+            }
+
+            timeToMinutes(timeStr) {
+                const [hours, minutes] = timeStr.split(':').map(Number);
+                return hours * 60 + minutes;
+            }
+
+            autoControlSystems() {
+                const { temperature, humidity, soilMoisture } = this.sensors;
+                
+                if (this.systems.heating.auto) {
+                    this.systems.heating.status = temperature.current < temperature.target - 1;
+                }
+                if (this.systems.cooling.auto) {
+                    this.systems.cooling.status = temperature.current > temperature.target + 1;
+                }
+                if (this.systems.ventilation.auto) {
+                    this.systems.ventilation.status = humidity.current > humidity.target + 5;
+                }
+                if (this.systems.watering.auto) {
+                    if (soilMoisture.current < soilMoisture.target - 5) {
+                        this.systems.watering.status = true;
+                        setTimeout(() => {
+                            this.systems.watering.status = false;
+                            this.systems.watering.lastRun = 'Az önce';
+                        }, 3000);
+                    }
+                }
+            }
+
+            checkAlarms() {
+                this.alarmSystem.activeAlarms = [];
+                
+                if (!this.alarmSystem.enabled) return;
+
+                Object.entries(this.sensors).forEach(([sensor, data]) => {
+                    if (data.current < data.min) {
+                        this.alarmSystem.activeAlarms.push({
+                            type: 'critical',
+                            sensor: sensor,
+                            message: `${this.getSensorName(sensor)} kritik seviyenin altında!`,
+                            value: data.current.toFixed(1),
+                            timestamp: new Date()
+                        });
+                    }
+                    if (data.current > data.max) {
+                        this.alarmSystem.activeAlarms.push({
+                            type: 'critical',
+                            sensor: sensor,
+                            message: `${this.getSensorName(sensor)} kritik seviyenin üstünde!`,
+                            value: data.current.toFixed(1),
+                            timestamp: new Date()
+                        });
+                    }
+                });
+
+                if (this.alarmSystem.activeAlarms.length > 0 && this.alarmSystem.soundEnabled) {
+                    this.playAlarmSound();
+                }
+            }
+
+            playAlarmSound() {
+                console.log('🚨 ALARM: Kritik durum tespit edildi!');
+            }
+
+            startNotificationTimer() {
+                if (this.notificationSettings.enabled) {
+                    this.notificationTimer = setInterval(() => {
+                        this.sendNotification();
+                    }, this.notificationSettings.interval * 60 * 1000);
+                }
+            }
+
+            sendNotification() {
+                const now = new Date();
+                this.notificationSettings.lastNotification = now;
+                
+                const status = {
+                    temperature: this.sensors.temperature.current.toFixed(1),
+                    humidity: this.sensors.humidity.current.toFixed(1),
+                    alarms: this.alarmSystem.activeAlarms.length
+                };
+
+                console.log('📱 Bildirim gönderildi:', status);
+                this.updateNotificationDisplay();
+            }
+
+            getSensorName(sensor) {
+                const names = {
+                    temperature: 'Sıcaklık',
+                    humidity: 'Nem',
+                    soilMoisture: 'Toprak Nemi',
+                    lightLevel: 'Işık Seviyesi'
+                };
+                return names[sensor] || sensor;
+            }
+
+            setLightMode(mode) {
+                this.lightSystem.status = mode;
+                this.lightSystem.manualOverride = mode !== 'auto';
+                this.updateUI();
+            }
+
+            toggleAlarmSystem() {
+                this.alarmSystem.enabled = !this.alarmSystem.enabled;
+                if (!this.alarmSystem.enabled) {
+                    this.alarmSystem.activeAlarms = [];
+                }
+                this.updateUI();
+            }
+
+            toggleSystem(systemName) {
+                if (this.systems[systemName]) {
+                    this.systems[systemName].status = !this.systems[systemName].status;
+                    this.updateUI();
+                }
+            }
+
+            setAutoMode(systemName, enabled) {
+                if (this.systems[systemName]) {
+                    this.systems[systemName].auto = enabled;
+                }
+            }
+
+            setNotificationInterval(minutes) {
+                this.notificationSettings.interval = minutes;
+                if (this.notificationTimer) {
+                    clearInterval(this.notificationTimer);
+                }
+                this.startNotificationTimer();
+                this.updateUI();
+            }
+
+            updateUI() {
+                // Sensör verilerini güncelle
+                Object.entries(this.sensors).forEach(([sensor, data]) => {
+                    const element = document.querySelector(`[data-sensor="${sensor}"]`);
+                    if (element) {
+                        const valueEl = element.querySelector('.sensor-value');
+                        const progressEl = element.querySelector('.sensor-progress');
+                        
+                        if (valueEl) valueEl.textContent = data.current.toFixed(1);
+                        if (progressEl) {
+                            const percentage = ((data.current - data.min) / (data.max - data.min)) * 100;
+                            progressEl.style.width = `${Math.max(0, Math.min(100, percentage))}%`;
+                        }
+                    }
+                });
+
+                // Sistem durumlarını güncelle
+                Object.entries(this.systems).forEach(([system, data]) => {
+                    const element = document.querySelector(`[data-system="${system}"]`);
+                    if (element) {
+                        const statusEl = element.querySelector('.system-status');
+                        if (statusEl) {
+                            statusEl.textContent = data.status ? 'AÇIK' : 'KAPALI';
+                            statusEl.className = `system-status ${data.status ? 'active' : 'inactive'}`;
+                        }
+                    }
+                });
+
+                // Işık sistemi durumunu güncelle
+                this.updateLightSystemUI();
+                
+                // Alarm sistemini güncelle
+                this.updateAlarmSystemUI();
+                
+                // Bildirim sistemini güncelle
+                this.updateNotificationDisplay();
+            }
+
+            updateLightSystemUI() {
+                const lightButtons = document.querySelectorAll('.light-control-btn');
+                lightButtons.forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.dataset.mode === this.lightSystem.status) {
+                        btn.classList.add('active');
+                    }
+                });
+
+                const lightStatus = document.querySelector('.light-actual-status');
+                if (lightStatus) {
+                    lightStatus.textContent = this.lightSystem.actualStatus ? 'AÇIK' : 'KAPALI';
+                    lightStatus.className = `light-actual-status ${this.lightSystem.actualStatus ? 'on' : 'off'}`;
+                }
+            }
+
+            updateAlarmSystemUI() {
+                const alarmToggle = document.querySelector('.alarm-toggle');
+                const alarmCount = document.querySelector('.alarm-count');
+                const alarmsList = document.querySelector('.alarms-list');
+
+                if (alarmToggle) {
+                    alarmToggle.classList.toggle('active', this.alarmSystem.enabled);
+                }
+
+                if (alarmCount) {
+                    alarmCount.textContent = this.alarmSystem.activeAlarms.length;
+                    alarmCount.className = `alarm-count ${this.alarmSystem.activeAlarms.length > 0 ? 'has-alarms' : ''}`;
+                }
+
+                if (alarmsList) {
+                    if (this.alarmSystem.activeAlarms.length === 0) {
+                        alarmsList.innerHTML = '<div class="no-alarms">Aktif alarm yok</div>';
+                    } else {
+                        alarmsList.innerHTML = this.alarmSystem.activeAlarms.map(alarm => `
+                            <div class="alarm-item ${alarm.type}">
+                                <div class="alarm-icon">⚠️</div>
+                                <div class="alarm-content">
+                                    <div class="alarm-message">${alarm.message}</div>
+                                    <div class="alarm-value">Değer: ${alarm.value}</div>
+                                </div>
+                            </div>
+                        `).join('');
+                    }
+                }
+            }
+
+            updateNotificationDisplay() {
+                const intervalDisplay = document.querySelector('.notification-interval');
+                const lastNotification = document.querySelector('.last-notification');
+
+                if (intervalDisplay) {
+                    intervalDisplay.textContent = `${this.notificationSettings.interval} dakika`;
+                }
+
+                if (lastNotification && this.notificationSettings.lastNotification) {
+                    const time = this.notificationSettings.lastNotification.toLocaleTimeString('tr-TR');
+                    lastNotification.textContent = `Son: ${time}`;
+                }
+            }
         }
 
-        function updateDisplay() {
-            // Son veriler
-            document.getElementById('temperature').textContent = `${currentData.temperature} °C`;
-            document.getElementById('light').textContent = currentData.light;
-            document.getElementById('lastUpdate').textContent = currentData.lastUpdate.toLocaleTimeString();
+        // UI Bileşenleri Fonksiyonları
+        function createSensorCard(sensor, data, unit) {
+            const sensorNames = {
+                temperature: 'Sıcaklık',
+                humidity: 'Nem Oranı',
+                soilMoisture: 'Toprak Nemi',
+                lightLevel: 'Işık Seviyesi'
+            };
 
-            // Sistem durumu
-            const sys = currentData.systemStatus;
-            document.getElementById('sys-temperature').textContent = `${sys.temperature} °C`;
-            document.getElementById('sys-light').textContent = sys.light;
-            document.getElementById('sys-led').textContent = sys.led;
-            document.getElementById('sys-alarm').textContent = sys.alarm;
-            document.getElementById('sys-wifi').textContent = `${sys.wifi} dBm`;
-            document.getElementById('sys-interval').textContent = `${sys.interval} dakika`;
-            document.getElementById('sys-records').textContent = `${sys.records}/144`;
+            const sensorIcons = {
+                temperature: '🌡️',
+                humidity: '💧',
+                soilMoisture: '🌱',
+                lightLevel: '☀️'
+            };
+
+            return `
+                <div class="sensor-card modern" data-sensor="${sensor}">
+                    <div class="sensor-header">
+                        <div class="sensor-icon">${sensorIcons[sensor]}</div>
+                        <div class="sensor-info">
+                            <h3 class="sensor-name">${sensorNames[sensor]}</h3>
+                            <div class="sensor-unit">${unit}</div>
+                        </div>
+                    </div>
+                    <div class="sensor-display">
+                        <div class="sensor-value">${data.current.toFixed(1)}</div>
+                        <div class="sensor-target">Hedef: ${data.target}${unit}</div>
+                    </div>
+                    <div class="sensor-progress-container">
+                        <div class="sensor-progress-track">
+                            <div class="sensor-progress" style="width: 0%"></div>
+                        </div>
+                        <div class="sensor-range">
+                            <span class="range-min">${data.min}${unit}</span>
+                            <span class="range-max">${data.max}${unit}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
         }
 
-        async function sendCommand(command) {
+        function createSystemCard(system, data) {
+            const systemNames = {
+                heating: 'Isıtma Sistemi',
+                cooling: 'Soğutma Sistemi',
+                watering: 'Sulama Sistemi',
+                ventilation: 'Havalandırma'
+            };
+
+            const systemIcons = {
+                heating: '🔥',
+                cooling: '❄️',
+                watering: '💧',
+                ventilation: '🌀'
+            };
+
+            return `
+                <div class="system-card modern" data-system="${system}">
+                    <div class="system-header">
+                        <div class="system-icon">${systemIcons[system]}</div>
+                        <div class="system-info">
+                            <h3 class="system-name">${systemNames[system]}</h3>
+                            <div class="system-status inactive">KAPALI</div>
+                        </div>
+                    </div>
+                    <div class="system-controls">
+                        <button class="system-toggle" data-toggle="${system}">
+                            <span class="toggle-text">Manuel Kontrol</span>
+                        </button>
+                        <label class="auto-switch">
+                            <input type="checkbox" ${data.auto ? 'checked' : ''} data-auto="${system}">
+                            <span class="switch-label">Otomatik</span>
+                        </label>
+                    </div>
+                    ${data.lastRun ? `<div class="system-info-text">Son çalışma: ${data.lastRun}</div>` : ''}
+                </div>
+            `;
+        }
+
+        // Telegram Bot Fonksiyonları
+        async function sendTelegramCommand(command) {
             const button = event.target;
             const originalText = button.textContent;
             
-            // Buton durumunu değiştir
             button.disabled = true;
-            button.classList.add('loading');
             button.textContent = 'Gönderiliyor...';
 
             try {
@@ -439,8 +1278,8 @@
                     showNotification(`Mesaj gönderildi: ${command}`);
                     document.getElementById('lastCommand').textContent = command;
                     
-                    // Komut sonrası veri simülasyonu
-                    simulateDataChange(command);
+                    // Komut sonrası sera sisteminde değişiklikleri simüle et
+                    simulateCommandEffect(command);
                 } else {
                     throw new Error(result.description || 'Bilinmeyen hata');
                 }
@@ -449,90 +1288,193 @@
                 console.error('Mesaj gönderme hatası:', error);
                 showNotification(`Hata: ${error.message}`, true);
             } finally {
-                // Her durumda buton durumunu geri yükle
                 setTimeout(() => {
                     button.disabled = false;
-                    button.classList.remove('loading');
                     button.textContent = originalText;
                 }, 500);
             }
         }
 
-        function getButtonOriginalText(command) {
-            const buttonTexts = {
-                'led ac': 'LED Aç',
-                'led kapat': 'LED Kapat',
-                'alarm ac': 'Alarm Aç',
-                'alarm kapat': 'Alarm Kapat',
-                'veri al': 'Veri Al',
-                'durum': 'Durum',
-                'yardim': 'Yardım',
-                'reset': 'Reset'
-            };
-            return buttonTexts[command] || command;
-        }
-
-        function simulateDataChange(command) {
-            // Komutlara göre sistem durumunu simüle et
+        function simulateCommandEffect(command) {
             switch(command) {
                 case 'led ac':
-                    currentData.systemStatus.led = 'YANDI';
+                    controller.setLightMode('on');
                     break;
                 case 'led kapat':
-                    currentData.systemStatus.led = 'KAPALI';
+                    controller.setLightMode('off');
                     break;
                 case 'alarm ac':
-                    currentData.systemStatus.alarm = 'AKTIF';
+                    controller.alarmSystem.enabled = true;
+                    controller.updateUI();
                     break;
                 case 'alarm kapat':
-                    currentData.systemStatus.alarm = 'KAPALI';
+                    controller.alarmSystem.enabled = false;
+                    controller.alarmSystem.activeAlarms = [];
+                    controller.updateUI();
                     break;
                 case 'veri al':
-                    // Rastgele veri güncelle
-                    currentData.temperature = (Math.random() * 10 + 15).toFixed(1);
-                    currentData.light = Math.floor(Math.random() * 100);
-                    currentData.lastUpdate = new Date();
+                    // Rastgele sensör verilerini güncelle
+                    Object.keys(controller.sensors).forEach(sensor => {
+                        const data = controller.sensors[sensor];
+                        const variation = (Math.random() - 0.5) * 4;
+                        data.current = Math.max(data.min, Math.min(data.max, data.current + variation));
+                    });
+                    controller.updateUI();
                     break;
                 case 'durum':
-                    // Sistem durumunu güncelle
-                    currentData.systemStatus.temperature = (Math.random() * 5 + 16).toFixed(1);
-                    currentData.systemStatus.records = Math.floor(Math.random() * 144);
+                    // Sistem durumunu konsola yazdır
+                    console.log('Sistem Durumu:', {
+                        sensors: controller.sensors,
+                        systems: controller.systems,
+                        lightSystem: controller.lightSystem,
+                        alarms: controller.alarmSystem.activeAlarms.length
+                    });
                     break;
             }
-            updateDisplay();
         }
 
-        function refreshData() {
-            const refreshBtn = document.querySelector('.refresh-btn');
-            refreshBtn.style.transform = 'rotate(360deg) scale(1.1)';
-            
-            // Rastgele veri güncellemesi simülasyonu
-            currentData.temperature = (Math.random() * 10 + 15).toFixed(1);
-            currentData.light = Math.floor(Math.random() * 100);
-            currentData.lastUpdate = new Date();
-            currentData.systemStatus.temperature = (Math.random() * 5 + 16).toFixed(1);
-            currentData.systemStatus.wifi = -75 - Math.floor(Math.random() * 20);
-            
-            updateDisplay();
-            showNotification('Veriler güncellendi');
+        // Bildirim gösterme fonksiyonu
+        function showNotification(message, isError = false) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${isError ? 'error' : ''} show`;
             
             setTimeout(() => {
-                refreshBtn.style.transform = '';
-            }, 300);
+                notification.classList.remove('show');
+            }, 3000);
         }
 
-        // Sayfa yüklendiğinde verileri göster
-        window.addEventListener('load', () => {
-            updateDisplay();
-            showNotification('Kontrol paneli hazır');
+        // Sistem saati güncelleme
+        function updateSystemTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('tr-TR');
+            const dateString = now.toLocaleDateString('tr-TR');
+            const timeElement = document.getElementById('system-time');
+            if (timeElement) {
+                timeElement.textContent = `${dateString} ${timeString}`;
+            }
+        }
+
+        // Ana kontrol sistemi başlatma
+        const controller = new GreenhouseController();
+
+        // Sensör kartlarını oluştur
+        const sensorsGrid = document.getElementById('sensors-grid');
+        const sensorUnits = {
+            temperature: '°C',
+            humidity: '%',
+            soilMoisture: '%', 
+            lightLevel: ' lux'
+        };
+
+        Object.entries(controller.sensors).forEach(([sensor, data]) => {
+            sensorsGrid.innerHTML += createSensorCard(sensor, data, sensorUnits[sensor]);
         });
 
-        // Otomatik veri güncelleme (30 saniye)
+        // Sistem kartlarını oluştur
+        const systemsGrid = document.getElementById('systems-grid');
+        Object.entries(controller.systems).forEach(([system, data]) => {
+            systemsGrid.innerHTML += createSystemCard(system, data);
+        });
+
+        // Event listener'ları ayarla
+        document.addEventListener('click', (e) => {
+            // Işık kontrol butonları
+            if (e.target.closest('.light-control-btn')) {
+                const button = e.target.closest('.light-control-btn');
+                const mode = button.dataset.mode;
+                controller.setLightMode(mode);
+            }
+            
+            // Sistem toggle butonları
+            if (e.target.closest('[data-toggle]')) {
+                const button = e.target.closest('[data-toggle]');
+                const system = button.dataset.toggle;
+                controller.toggleSystem(system);
+            }
+            
+            // Alarm sistemi toggle
+            if (e.target.closest('.alarm-toggle')) {
+                controller.toggleAlarmSystem();
+            }
+        });
+
+        // Checkbox değişiklikleri
+        document.addEventListener('change', (e) => {
+            // Otomatik mod ayarları
+            if (e.target.matches('[data-auto]')) {
+                const system = e.target.dataset.auto;
+                controller.setAutoMode(system, e.target.checked);
+            }
+            
+            // Bildirim süresi ayarı
+            if (e.target.matches('.notification-interval-select')) {
+                const interval = parseInt(e.target.value);
+                controller.setNotificationInterval(interval);
+            }
+        });
+
+        // Ripple efekti
+        document.addEventListener('click', function(e) {
+            if (e.target.tagName === 'BUTTON') {
+                const button = e.target;
+                const ripple = document.createElement('span');
+                const rect = button.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size / 2;
+                const y = e.clientY - rect.top - size / 2;
+                
+                ripple.style.cssText = `
+                    position: absolute;
+                    width: ${size}px;
+                    height: ${size}px;
+                    left: ${x}px;
+                    top: ${y}px;
+                    background: rgba(255, 255, 255, 0.3);
+                    border-radius: 50%;
+                    transform: scale(0);
+                    animation: ripple 0.6s linear;
+                    pointer-events: none;
+                `;
+                
+                button.style.position = 'relative';
+                button.style.overflow = 'hidden';
+                button.appendChild(ripple);
+                
+                setTimeout(() => ripple.remove(), 600);
+            }
+        });
+
+        // Sayfa yüklendiğinde başlat
+        window.addEventListener('load', () => {
+            controller.start();
+            updateSystemTime();
+            setInterval(updateSystemTime, 1000);
+            
+            // Başlangıç bildirimi
+            showNotification('Sera Kontrol Merkezi hazır - Telegram Bot aktif');
+            
+            // Kartlara hover efektleri
+            document.querySelectorAll('.sensor-card, .system-card').forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-4px)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                });
+            });
+        });
+
+        // Otomatik veri güncelleme simülasyonu
         setInterval(() => {
-            // Küçük veri değişiklikleri simüle et
-            currentData.temperature = (parseFloat(currentData.temperature) + (Math.random() - 0.5) * 0.2).toFixed(1);
-            currentData.lastUpdate = new Date();
-            updateDisplay();
+            // WiFi sinyal gücünü güncelle
+            const wifiSignal = -75 - Math.floor(Math.random() * 20);
+            document.getElementById('wifiSignal').textContent = `${wifiSignal} dBm`;
+            
+            // Kayıtlı veri sayısını güncelle
+            const records = Math.floor(Math.random() * 144);
+            document.getElementById('dataRecords').textContent = `${records}/144`;
         }, 30000);
     </script>
 </body>
